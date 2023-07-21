@@ -82,14 +82,14 @@ int Feature_Match_most_pic();
 
 /*-------其他測試程式宣告-------*/
 // 230720，將3D量測後的資料轉成csv檔案
-bool Read_XML_230720();
+bool Read_2_XML_230720();
 
 
 int main() {
 	//Cam_Laser_Calibration_v2();
 	//Cam_Laser_Calibration_stereo_v3();
 	//Cam_Laser_Calibration_stereo_Blob_v3();
-	Read_XML_230720();
+	Read_2_XML_230720();
 	return 0;
 }
 
@@ -234,7 +234,7 @@ bool Cam_Laser_Calibration_v2() {
 	// 釋放容器
 	cap.release();
 	//輸出CSV
-	CL.Out_Data_Csv(Csv_Savepath + Csv_Filename_Theory, Points_Laser_Theory, Points_Num_total);//理論值
+	CL.Out_Data_Csv_2f(Csv_Savepath + Csv_Filename_Theory, Points_Laser_Theory, Points_Num_total);//理論值
 	std::cout << "Finsih!" << endl;
 	return true;
 }
@@ -303,7 +303,7 @@ bool Cam_Laser_Calibration_v2_BOLB() {
 	Ptr<SimpleBlobDetector> detector = SimpleBlobDetector::create(params);
 
 	//藉由讀取理論點數量，得到對應的照片數
-	CL.Read_Data_Csv(Csv_Savepath + Csv_Filename_Theory, Point_Theory);
+	CL.Read_Data_Csv_2f(Csv_Savepath + Csv_Filename_Theory, Point_Theory);
 
 	// 先顯示第一張照片，選取ROI區域
 	Im_Name = "0000";// 起始照片編號
@@ -370,8 +370,8 @@ bool Cam_Laser_Calibration_v2_BOLB() {
 	Im_Filename_All = Im_Savepath + Im_Name + Im_Savetype;
 	//Im_Filename_All = "D:\\59.恩哲的研究\\221016laser校正與通訊整合測試\\230208\\230208_dection_result.png";
 	imwrite(Im_Filename_All, frame);
-	CL.Out_Data_Csv(Csv_Savepath + Csv_Filename_Dectection, Points_Laser_Detect, get_number);//量測結果
-	CL.Out_Data_Csv(Csv_Savepath + Csv_Filename_Theory_v2, Point_Theory_v2, get_number);//更新後的理論點
+	CL.Out_Data_Csv_2f(Csv_Savepath + Csv_Filename_Dectection, Points_Laser_Detect, get_number);//量測結果
+	CL.Out_Data_Csv_2f(Csv_Savepath + Csv_Filename_Theory_v2, Point_Theory_v2, get_number);//更新後的理論點
 	std::cout << "共找到 " << get_number << " 點， 未找到 " << lose_number << " 點 " << endl;
 	return true;
 }
@@ -386,8 +386,8 @@ bool Cam_CAL_LSM() {
 	vector<Point2f> Point_Get;
 	vector<Point2f> Point_Theory;
 	//讀取檔案
-	CL.Read_Data_Csv(Csv_Path + Csv_Header_Get, Point_Get);
-	CL.Read_Data_Csv(Csv_Path + Csv_Header_Theory, Point_Theory);
+	CL.Read_Data_Csv_2f(Csv_Path + Csv_Header_Get, Point_Get);
+	CL.Read_Data_Csv_2f(Csv_Path + Csv_Header_Theory, Point_Theory);
 	for (int i = 0; i <= Point_Get.size() - 1; i++) {
 		std::cout << "第" << i << "點為 " << Point_Get[i].x << "," << Point_Get[i].y << endl;
 		std::cout << "第" << i << "點為 " << Point_Theory[i].x << "," << Point_Theory[i].y << endl;
@@ -422,8 +422,8 @@ bool Cam_CAL_LSM() {
 	vector<Point2f> Parameter_LSM_y;
 	Parameter_LSM_x.push_back(Point2f(x_a, x_b));
 	Parameter_LSM_y.push_back(Point2f(y_a, y_b));
-	CL.Out_Data_Csv(Csv_Path + Csv_Header_Parameter_x, Parameter_LSM_x, Parameter_LSM_x.size());
-	CL.Out_Data_Csv(Csv_Path + Csv_Header_Parameter_y, Parameter_LSM_y, Parameter_LSM_y.size());
+	CL.Out_Data_Csv_2f(Csv_Path + Csv_Header_Parameter_x, Parameter_LSM_x, Parameter_LSM_x.size());
+	CL.Out_Data_Csv_2f(Csv_Path + Csv_Header_Parameter_y, Parameter_LSM_y, Parameter_LSM_y.size());
 	return true;
 }
 bool Cam_CAL_LSM_quadratic() {
@@ -437,8 +437,8 @@ bool Cam_CAL_LSM_quadratic() {
 	vector<Point2f> Point_Get;
 	vector<Point2f> Point_Theory;
 	//讀取檔案
-	CL.Read_Data_Csv(Csv_Path + Csv_Header_Get, Point_Get);
-	CL.Read_Data_Csv(Csv_Path + Csv_Header_Theory, Point_Theory);
+	CL.Read_Data_Csv_2f(Csv_Path + Csv_Header_Get, Point_Get);
+	CL.Read_Data_Csv_2f(Csv_Path + Csv_Header_Theory, Point_Theory);
 	for (int i = 0; i <= Point_Get.size() - 1; i++) {
 		std::cout << "第" << i << "點為 " << Point_Get[i].x << "," << Point_Get[i].y << endl;
 		std::cout << "第" << i << "點為 " << Point_Theory[i].x << "," << Point_Theory[i].y << endl;
@@ -777,8 +777,8 @@ bool Cam_Laser_repeatability_result() {
 	String Filename_theory = FileDate + "_theory";
 	String File_type = ".csv";
 
-	CL.Out_Data_Csv(Folder_Path + "\\" + Filename_mean_error + File_type, point_dec_mean_error, point_dec_mean_error.size());
-	CL.Out_Data_Csv(Folder_Path + "\\" + Filename_theory + File_type, Point_Theory_v2_time[0], Point_Theory_v2_time[0].size());// 輸出理論點以供參考
+	CL.Out_Data_Csv_2f(Folder_Path + "\\" + Filename_mean_error + File_type, point_dec_mean_error, point_dec_mean_error.size());
+	CL.Out_Data_Csv_2f(Folder_Path + "\\" + Filename_theory + File_type, Point_Theory_v2_time[0], Point_Theory_v2_time[0].size());// 輸出理論點以供參考
 	return true;
 }
 int Feature_Match_Online_v5() {
@@ -802,8 +802,8 @@ int Feature_Match_Online_v5() {
 	vector<Point2f>Parameter_y;// y 方向的校正參數， .x為 a， .y為 b
 
 	// 讀取校正參數
-	CL.Read_Data_Csv(Csv_Path + Csv_Header_Parameter_x, Parameter_x);
-	CL.Read_Data_Csv(Csv_Path + Csv_Header_Parameter_y, Parameter_y);
+	CL.Read_Data_Csv_2f(Csv_Path + Csv_Header_Parameter_x, Parameter_x);
+	CL.Read_Data_Csv_2f(Csv_Path + Csv_Header_Parameter_y, Parameter_y);
 
 	// 打開各項設備
 	PortOpen();// 打開連接雷射振鏡的連接口
@@ -1752,7 +1752,7 @@ bool Read_XML() {
 	fs.release();
 	return true;
 }
-bool Read_XML_230720() {
+bool Read_2_XML_230720() {
 
 	// XML 檔案 讀取
 	String XML_File_Path = FilePath + FileDate+"\\";
@@ -1767,23 +1767,33 @@ bool Read_XML_230720() {
 
 	// CSV 檔案 儲存
 	String Csv_file_path = XML_File_Path;
-	String Csv_file_name = FileDate + "_stero_data" + ".csv";
-	
+	String Csv_file_name_theroy = FileDate + "_csv_theroy" + ".csv";
+	String Csv_file_name_detect = FileDate + "_csv_detect" + ".csv";
+	String Csv_file_name_rw = FileDate + "_csv_rw" + ".csv";
 	// 讀取容器
 	vector<Point2f> Point_Theory_Used;//檢測完後的可用理論點，雷射座標
 	vector<Point2f>Points_Laser_Detect;// 檢測完的點，像素
 	vector<Point3f>Points_Laser_Detect_RW;// 檢測完的點，3D
+	int get_number;// 檢測的有效data數量
 
 	// 讀取資料
 	Fs_Xml_Read["Point_Theory_Used"] >> Point_Theory_Used;
 	Fs_Xml_Read["Points_Laser_Detect"] >> Points_Laser_Detect;
 	Fs_Xml_Read["Points_Laser_Detect_RW"] >> Points_Laser_Detect_RW;
-
+	Fs_Xml_Read["get_number"] >> get_number;
 	// 輸出成csv
+	CL.Out_Data_Csv_2f(Csv_file_path + Csv_file_name_theroy, Point_Theory_Used, get_number);
+	CL.Out_Data_Csv_2f(Csv_file_path + Csv_file_name_detect, Points_Laser_Detect, get_number);
+	CL.Out_Data_Csv_3f(Csv_file_path + Csv_file_name_rw, Points_Laser_Detect_RW, get_number);
 
+	cout << "Out Finish!" << endl;
 
+	// 讀取進來
+	CL.Read_Data_Csv_2f(Csv_file_path + Csv_file_name_theroy, Point_Theory_Used);
+	CL.Read_Data_Csv_2f(Csv_file_path + Csv_file_name_detect, Points_Laser_Detect);
+	CL.Read_Data_Csv_3f(Csv_file_path + Csv_file_name_rw, Points_Laser_Detect_RW);
 
-
+	cout << "Read Finish!" << endl;
 
 	return true;
 }

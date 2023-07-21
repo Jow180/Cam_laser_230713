@@ -6,7 +6,7 @@
 string CamLaser::End_code = "0000000000000000000000000000000000";
 /*---功能用小程式---*/
 
-void CamLaser::Out_Data_Csv(String path, vector<Point2f> Out_Point, int Point_number) {
+void CamLaser::Out_Data_Csv_2f(String path, vector<Point2f> Out_Point, int Point_number) {
 	//path:儲存檔案路徑，包含檔案名稱及類型
 	//Out_Point:儲存的資料
 	//Point_numbers:儲存的點數量
@@ -22,7 +22,23 @@ void CamLaser::Out_Data_Csv(String path, vector<Point2f> Out_Point, int Point_nu
 	Outfile.close();
 	std::cout << "儲存位置 : " << path << endl;
 }
-void CamLaser::Read_Data_Csv(String path, vector<Point2f>& Out_Point) {
+void CamLaser::Out_Data_Csv_3f(String path, vector<Point3f> Out_Point, int Point_number) {
+	//path:儲存檔案路徑，包含檔案名稱及類型
+	//Out_Point:儲存的資料
+	//Point_numbers:儲存的點數量
+
+	//建立CSV檔案
+	ofstream Outfile;
+	Outfile.open(path, ios::out);
+	//將找到的點位置紀錄起來為CSV檔案
+	for (int i = 0; i <= Point_number - 1; i++) {
+		Outfile << Out_Point[i].x << "," << Out_Point[i].y <<","<<Out_Point[i].z << endl;
+		std::cout << "第" << i << "點 儲存完畢" << endl;
+	}
+	Outfile.close();
+	std::cout << "儲存位置 : " << path << endl;
+}
+void CamLaser::Read_Data_Csv_2f(String path, vector<Point2f>& Out_Point) {
 	// path : 檔案路徑
 	// Out_Point : 存點用的容器
 	ifstream Infile;
@@ -41,6 +57,27 @@ void CamLaser::Read_Data_Csv(String path, vector<Point2f>& Out_Point) {
 		std::cout << "第" << i << "點為 " << Out_Point[i].x << "," << Out_Point[i].y << endl;
 	}
 	*/
+}
+void CamLaser::Read_Data_Csv_3f(String path, vector<Point3f>& Out_Point) {
+	// path : 檔案路徑
+	// Out_Point : 存點用的容器
+	ifstream Infile;
+	Infile.open(path, ios::in);//打開CSV檔案
+	if (!Infile) {
+		std::cout << "檔案不存在" << endl;
+	}
+	String Line;//用於CSV讀出的每行字串的容器
+	while (getline(Infile, Line)) {
+		//std::cout << Line << endl;
+		std::vector<std::string> ret = split(Line, ',');
+		Out_Point.push_back(Point3d(stold(ret[0]), stold(ret[1]),stold(ret[2])));
+	}
+	
+	for (int i = 0; i <= Out_Point.size() - 1; i++) {
+		std::cout << "第" << i << "點為 " << Out_Point[i].x << "," << Out_Point[i].y << "," << Out_Point[i].z << endl;
+		
+	}
+	
 }
 void CamLaser::Read_Csv2Mat(String path, Mat& Out_Mat) {
 	// 參考From:https://answers.opencv.org/question/55210/reading-csv-file-in-opencv/

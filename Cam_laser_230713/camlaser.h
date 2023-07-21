@@ -27,9 +27,13 @@ public:
 	/* 不一定每個都會被用到 */
 
 	// 輸出vector<Point2f>為Csv
-	static void Out_Data_Csv(String path, vector<Point2f> Out_Point, int Point_number);
+	static void Out_Data_Csv_2f(String path, vector<Point2f> Out_Point, int Point_number);
+	// 輸出vector<Point3f>為Csv
+	static void Out_Data_Csv_3f(String path, vector<Point3f> Out_Point, int Point_number);
 	// 輸入的Csv檔案為vector<Point2f>
-	static void Read_Data_Csv(String path, vector<Point2f>& Out_Point);
+	static void Read_Data_Csv_2f(String path, vector<Point2f>& Out_Point);
+	// 輸入的Csv檔案為vector<Point3f>
+	static void Read_Data_Csv_3f(String path, vector<Point3f>& Out_Point);
 	// 讀取CSV轉成Mat輸出
 	static void Read_Csv2Mat(String path, Mat& Out_Mat);
 	// 將Mat寫成csv檔案輸出
