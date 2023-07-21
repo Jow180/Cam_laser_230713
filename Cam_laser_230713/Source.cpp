@@ -22,7 +22,7 @@ CSerialPort mySerialPort;
 CamLaser CL;
 
 /*--- 參數宣告-- - */
-String FileDate = "230712";//存檔日期與版本名字，可加上當日版本號碼，同時也是建立資料夾的名稱
+String FileDate = "230721";//存檔日期與版本名字，可加上當日版本號碼，同時也是建立資料夾的名稱
 String FilePath = "D:\\59.恩哲的研究\\221016laser校正與通訊整合測試\\";// 存檔路徑
 int port_cam = 2;//相機的port編號
 int apiID = cv::CAP_DSHOW;// 相機api ID，宣告比較不會找不到相機
@@ -30,8 +30,8 @@ int port_laser = 6;//雷射振鏡所連接的port的編號
 
 // 校正用參數
 int Points_Pro_Range = 2048;//雷射投影的轉換後係數解析度
-int Points_R_Num = 12;//校正點列數量，請輸入4的倍數
-int Points_C_Num = 12;//校正點行數量，請輸入4的倍數
+int Points_R_Num = 4;//校正點列數量，請輸入4的倍數
+int Points_C_Num = 4;//校正點行數量，請輸入4的倍數
 int Points_Num_total = (Points_R_Num + 1) * (Points_C_Num + 1);
 
 // 設定相機解析度
@@ -87,9 +87,9 @@ bool Read_2_XML_230720();
 
 int main() {
 	//Cam_Laser_Calibration_v2();
-	//Cam_Laser_Calibration_stereo_v3();
+	Cam_Laser_Calibration_stereo_v3();
 	//Cam_Laser_Calibration_stereo_Blob_v3();
-	Read_2_XML_230720();
+	//Read_2_XML_230720();
 	return 0;
 }
 
@@ -1035,7 +1035,7 @@ int Cam_Laser_Calibration_stereo_v3() {
 	Sleep(3 * 1000);
 
 	//-----儲存影像位置-----//
-	String Savepath = Savepath;
+	String Savepath = FilePath;
 	String Im_Savepath = Savepath + FileDate + "\\";
 	String Im_Filename_Title = FileDate + "_image_";
 	String Im_Savetype = ".png";
@@ -1044,6 +1044,7 @@ int Cam_Laser_Calibration_stereo_v3() {
 
 	// 其他變數
 	rs2_intrinsics intr;
+	int cycle;// 用於分割每次校正循環
 
 	// 開始讀取影像
 	pipe.start(cfg);
@@ -1127,6 +1128,8 @@ int Cam_Laser_Calibration_stereo_v3() {
 
 			}
 		}
+		cout <<"完成第 "<<i<< " 個循環，請輸入任意數字以繼續" << endl;
+		cin >> cycle;
 	}
 	// 輸出內參
 	intr = color_frame.get_profile().as<rs2::video_stream_profile>().get_intrinsics(); // Realsense內參
@@ -1767,7 +1770,7 @@ bool Read_2_XML_230720() {
 
 	// CSV 檔案 儲存
 	String Csv_file_path = XML_File_Path;
-	String Csv_file_name_theroy = FileDate + "_csv_theroy" + ".csv";
+	String Csv_file_name_theroy = FileDate + "_csv_theory" + ".csv";
 	String Csv_file_name_detect = FileDate + "_csv_detect" + ".csv";
 	String Csv_file_name_rw = FileDate + "_csv_rw" + ".csv";
 	// 讀取容器
