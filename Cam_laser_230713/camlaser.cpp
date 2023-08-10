@@ -519,12 +519,11 @@ void CamLaser::LSM_Trans_quadratic(Point2f& input_point, Point2f& out_point, dou
 	out_point.x = x_a * input_point.x * input_point.x + x_b * input_point.x + x_c;
 	out_point.y = y_a * input_point.y * input_point.y + y_b * input_point.y + y_c;
 }
-void CamLaser::Feature_ORB(int, void*, Mat img1, Mat img2, vector<Point2f>& get_point4)
+void CamLaser::Feature_ORB(int, void*, Mat img1, Mat img2, vector<Point2f>& get_point4,int &goodmatches_size)
 {	//img1輸入的模板
 	//img2比對的圖片
 	//get_point4 輸出的圖片點位置 4點
 
-	int Hession = 400;
 	double t1 = getTickCount();
 	//特徵點提取
 	Ptr<ORB> detector = ORB::create(2000);
@@ -576,7 +575,8 @@ void CamLaser::Feature_ORB(int, void*, Mat img1, Mat img2, vector<Point2f>& get_
 	//----------目標物體用矩形標識出來------------//
 	Mat H_copy;
 	//std::cout << "goodmatches : " << goodmatches.size() << std::endl;
-	if (goodmatches.size() > 15) {
+	goodmatches_size = goodmatches.size();
+	if (goodmatches.size() > 10 && goodmatches.size() < 500) {
 		vector<Point2f> obj;
 		vector<Point2f>scene;
 		for (size_t i = 0; i < goodmatches.size(); i++)

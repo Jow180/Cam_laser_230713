@@ -87,9 +87,10 @@ bool Read_2_XML_230720();
 
 int main() {
 	//Cam_Laser_Calibration_v2();
-	Cam_Laser_Calibration_stereo_v3();
+	//Cam_Laser_Calibration_stereo_v3();
 	//Cam_Laser_Calibration_stereo_Blob_v3();
 	//Read_2_XML_230720();
+	Feature_Match_most_pic();
 	return 0;
 }
 
@@ -467,7 +468,13 @@ bool Cam_CAL_LSM_quadratic() {
 		std::cout << "影像 y: " << y_get[i] << " 理論y : " << y_thy[i] << ", 傳送給雷射y : " << (y_get[i] * y_get[i] * y_a + y_get[i] * y_b + y_c) << endl;
 		std::cout << endl;
 	}
-
+	//宣告儲存用的向量容器
+	vector<Point3f> Parameter_LSM_x;
+	vector<Point3f> Parameter_LSM_y;
+	Parameter_LSM_x.push_back(Point3f(x_a, x_b,x_c));
+	Parameter_LSM_y.push_back(Point3f(y_a, y_b,y_c));
+	CL.Out_Data_Csv_3f(Csv_Path + Csv_Header_Parameter_x, Parameter_LSM_x, Parameter_LSM_x.size());
+	CL.Out_Data_Csv_3f(Csv_Path + Csv_Header_Parameter_y, Parameter_LSM_y, Parameter_LSM_y.size());
 
 	return true;
 }
@@ -788,6 +795,7 @@ int Feature_Match_Online_v5() {
 	int num = 0;
 	vector<Point2f> coner_point(4);// 影像座標上的Feature Match四個點
 	vector<Point2f> coner_point_Laser(4);// 轉換到雷射座標的四個點
+	int goodmatches_size;// 好特徵點數量
 	img1 = imread(FilePath + "221121_特徵匹配\\pic008.jpg");
 	String code_out;// 輸出的X1 code指令
 	char* code_out_ch;// 輸出的X1 code指令 char型態
@@ -797,13 +805,21 @@ int Feature_Match_Online_v5() {
 	String Csv_Header_Parameter_x = FileDate + "_x_Cal_Parameter.csv";// x方向的校正參數
 	String Csv_Header_Parameter_y = FileDate + "_y_Cal_Parameter.csv";// y方向的校正參數
 
-	// 校正參數 容器
+	// 校正參數 容器，一階級
 	vector<Point2f>Parameter_x;// x 方向的校正參數， .x為 a， .y為 b
 	vector<Point2f>Parameter_y;// y 方向的校正參數， .x為 a， .y為 b
 
-	// 讀取校正參數
+	// 校正參數 容器，二階級
+	vector<Point3f>Parameter_x_qu;// x 方向的校正參數， .x為 a， .y為 b
+	vector<Point3f>Parameter_y_qu;// y 方向的校正參數， .x為 a， .y為 b
+
+	// 讀取校正參數，一階級
 	CL.Read_Data_Csv_2f(Csv_Path + Csv_Header_Parameter_x, Parameter_x);
 	CL.Read_Data_Csv_2f(Csv_Path + Csv_Header_Parameter_y, Parameter_y);
+
+	// 讀取校正參數，二階級
+	CL.Read_Data_Csv_3f(Csv_Path + Csv_Header_Parameter_x, Parameter_x_qu);
+	CL.Read_Data_Csv_3f(Csv_Path + Csv_Header_Parameter_y, Parameter_y_qu);
 
 	// 打開各項設備
 	PortOpen();// 打開連接雷射振鏡的連接口
@@ -836,14 +852,18 @@ int Feature_Match_Online_v5() {
 		}
 
 		//imshow("Feature Match", frame);
-		CL.Feature_ORB(0, 0, img1, frame, coner_point);//Feature Match得到四個點
+		CL.Feature_ORB(0, 0, img1, frame, coner_point, goodmatches_size);//Feature Match得到四個點
 		frame_copy = frame.clone();
 		for (int j = 0; j < 4; j++) {
 			line(frame_copy, coner_point[j], coner_point[(j + 1) % 4], Scalar(0, 0, 255), 2, 8, 0);// 更改後
 			//std::cout << num << "     第" << j << "點" << coner_point[j];
 		}
 		for (int k = 0; k < 4; k++) {
+			//	一階級
 			CL.LSM_Trans(coner_point[k], coner_point_Laser[k], Parameter_x[0].x, Parameter_x[0].y, Parameter_y[0].x, Parameter_y[0].y);
+			//	二階級
+			CL.LSM_Trans_quadratic(coner_point[k], coner_point_Laser[k], Parameter_x_qu[0].x, Parameter_x_qu[0].y, Parameter_x_qu[0].z,//
+				Parameter_y_qu[0].x, Parameter_y_qu[0].y, Parameter_y_qu[0].z);
 		}
 		std::cout << endl;
 		CL.Xcode_ctrl(coner_point_Laser, code_out);
@@ -1442,14 +1462,15 @@ int Feature_Match_most_pic() {
 	vector<String> Pattern_list;
 	Mat frame;
 	Mat frame_copy;
-	int Pattern_number = 2;// 清單上讀取幾張，以前面排到後面
+	int Pattern_number = 1;// 清單上讀取幾張，以前面排到後面
 	//vector<Point2f>coner_point_list[];
 	vector<vector<Point2f>> coner_point_list;
 	vector<Point2f>coner_point;
+	int goodmatches_size;// 好特徵點數量
 	String window_name = "pattern";
 	// 讀取照片清單，預計以xml檔案讀取
-	Pattern_list.push_back(FilePath + "221121_特徵匹配\\pic009.jpg");
-	Pattern_list.push_back(FilePath + "221121_特徵匹配\\pic010.jpg");
+	//Pattern_list.push_back(FilePath + "221121_特徵匹配\\pic013.jpg");
+	Pattern_list.push_back(FilePath + "221121_特徵匹配\\pic014.jpg");
 
 	if (Pattern_number > Pattern_list.size()) {
 		std::cout << "ERROR!設定讀取照片數大於清單!" << std::endl;
@@ -1491,7 +1512,7 @@ int Feature_Match_most_pic() {
 			imshow(window_name + CL.int2string_4ch(i), Pattern_pics[i]);
 		}
 		for (int i = 0; i < Pattern_number; i++) {
-			CL.Feature_ORB(0, 0, Pattern_pics[i], frame, coner_point);//Feature Match得到四個點
+			CL.Feature_ORB(0, 0, Pattern_pics[i], frame, coner_point, goodmatches_size);//Feature Match得到四個點
 			coner_point_list.push_back(coner_point);
 			coner_point.clear();
 			/*std::cout <<"coner_point"<< coner_point << std::endl;
@@ -1512,6 +1533,8 @@ int Feature_Match_most_pic() {
 			}
 		}
 		coner_point_list.clear();
+		string text = "good match points:" + CL.NameCreate(4, goodmatches_size);
+		putText(frame_copy, text, Point(0,70), FONT_HERSHEY_COMPLEX, 0.8, Scalar(0, 255, 255), 2, LINE_8);
 		imshow("frame", frame_copy);
 		cv::waitKey(3);
 		if (waitkey == 27) {

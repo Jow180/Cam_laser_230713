@@ -74,7 +74,7 @@ public:
 	// LSM，二次方轉換
 	static void LSM_Trans_quadratic(Point2f& input_point, Point2f& out_point, double x_a, double x_b, double x_c, double y_a, double y_b, double y_c);
 	// 特徵匹配，用於比對兩張影像，並回傳4個點位置
-	static void Feature_ORB(int, static void*, Mat img1, Mat img2, vector<Point2f>& get_point4);
+	static void Feature_ORB(int, static void*, Mat img1, Mat img2, vector<Point2f>& get_point4, int& goodmatches_size);
 
 	/* -----核心程式----- */
 
